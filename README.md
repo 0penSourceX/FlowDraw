@@ -24,12 +24,13 @@ Whether you're a beginner exploring graphics or a developer looking to build som
 Here’s a glimpse of what you can expect:
 
 
-<img src="/githubPic/e.png"></img>
-<img src="/githubPic/b.png"></img>
-<img src="/githubPic/a.png"></img>
-<img src="/githubPic/c.png"></img>
-<img src="/githubPic/d.png"></img>
-<img src="/githubPic/g.png"></img>
+<img src="./githubPic/e.png"></img>
+<img src="./githubPic/b.png"></img>
+<img src="./githubPic/a.png"></img>
+<img src="./githubPic/c.png"></img>
+<img src="./githubPic/d.png"></img>
+<img src="./githubPic/g.png"></img>
+ 
  
 
 
