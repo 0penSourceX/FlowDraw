@@ -1,0 +1,18 @@
+.Seeting{
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 99;
+    cursor: pointer;
+    margin-left: 5px;
+    margin-top: 5px;
+    user-select: none;
+}
+
+.Seeting img {
+    transition: transform 0.3s ease;
+}
+.Seeting img:active{
+    transform: scale(1.1);
+
+}
