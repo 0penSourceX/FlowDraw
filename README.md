@@ -27,11 +27,16 @@ Here’s a glimpse of what you can expect:
 <img src="./githubPic/e.png"></img>
 <img src="./githubPic/b.png"></img>
 <img src="./githubPic/a.png"></img>
+<img width="1033" height="545" alt="image" src="https://github.com/user-attachments/assets/fcb32b37-0f0c-4b69-9b02-401e817a3cc5" />
+<img width="1900" height="863" alt="image" src="https://github.com/user-attachments/assets/264c4e7e-448f-4f32-8870-f77a16c009a7" />
 <img src="./githubPic/c.png"></img>
 <img src="./githubPic/d.png"></img>
 <img src="./githubPic/g.png"></img>
  
- 
+ <video class="my-video" controls autoplay loop muted>
+      <source src="./public/videoshow/show.webm" type="video/webm">
+    
+ </video>
 
 
 ---

@@ -1,3 +1,4 @@
+ 
 import RenderBoardOptimiaztion from "./Board/RenderBoardOptimiaztion"
  
 
@@ -7,7 +8,8 @@ import RenderBoardOptimiaztion from "./Board/RenderBoardOptimiaztion"
 const App = () => {
   return (
      <div className='renderboard'>
-     <RenderBoardOptimiaztion/>  
+     <RenderBoardOptimiaztion/>    
+ 
     
      </div>
   )

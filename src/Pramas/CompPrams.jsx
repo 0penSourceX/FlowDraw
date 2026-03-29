@@ -27,6 +27,16 @@ const CompPrams = ({onpassvalue}) => {
            <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M8 3V0H6V3H8Z" fill="#e0dcdc"></path> <path d="M0.792893 2.20711L3.29289 4.70711L4.70711 3.29289L2.20711 0.792893L0.792893 2.20711Z" fill="#e0dcdc"></path> <path d="M6 5L5 6.00001L8 15H10L10.7172 12.1314L14.2929 15.7071L15.7071 14.2929L12.1314 10.7172L15 10V8L6 5Z" fill="#e0dcdc"></path> <path d="M0 6H3V8H0V6Z" fill="#e0dcdc"></path> </g></svg>
           Curosr
         </button>
+
+        <button className="value111" onClick={()=>onpassvalue("HideNavbar")}>
+         <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect x="0" y="2" width="16" height="2" fill="#e0dcdc"/>
+        <path d="M4 8L8 12L12 8H4Z" fill="#e0dcdc"/>
+        <rect x="0" y="12" width="16" height="2" fill="#e0dcdc"/>
+        </svg>
+         
+          Hide Navbar
+        </button>
       </div>
     
   );
