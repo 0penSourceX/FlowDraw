@@ -1,6 +1,6 @@
 export function buildPath(points) {
 
-  if (points.length === 0) return "";
+  if (points.length === 0) return ""; // can you do circle with svg here if the point of length  =0 
 
   if (points.length === 1) {
     return `M ${points[0].x} ${points[0].y}`;

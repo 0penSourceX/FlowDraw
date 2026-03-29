@@ -16,3 +16,31 @@
     transform: scale(1.1);
 
 }
+
+
+@media (max-width: 856px) {
+  
+.Seeting{
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    top: 90%;
+    background-color: rgba(158, 152, 152, 0.2);
+    backdrop-filter: blur(1px);
+    border-radius:30px;
+    padding: 2px;
+    height: max-content;
+
+
+}
+
+.Seeting img {
+    transition: transform 0.3s ease;
+}
+.Seeting img:active{
+    transform: scale(1.1);
+
+}
+
+
+} 

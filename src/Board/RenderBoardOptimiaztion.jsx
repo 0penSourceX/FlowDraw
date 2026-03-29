@@ -11,6 +11,8 @@ import CompPrams from "../Pramas/CompPrams";
 import Button from "../Pramas/Setting";
 import Setting from "../Pramas/Setting";
 import Grid from "../Pramas/Grid";
+import { drawCircle } from "./darwCircle";
+import { drawCircles } from "./circleDrawSpecial";
  
 const RenderBoardOptimiaztion = () => {
  
@@ -28,12 +30,19 @@ const RenderBoardOptimiaztion = () => {
   let Buffer = useRef(new Path());
   let ErraserMode = useRef(false);
 
-  const [sizeLine, setSizeLine] = useState(5);
-  const [colorState, SetColorState] = useState("black");
+  const [sizeLine, setSizeLine] = useState(8);
+  const [colorState, SetColorState] = useState("#122d5c");
   const [show, SetShow] = useState(false);
   const [ShowSetting,SetShowSetting] = useState(false)
   const [showFirstBox,SetShowFirstBox] = useState(false)
- 
+  const [hidenavbar,sethidenavbar] = useState(true)
+  const [TranslateX,SetTranslateX] = useState(0)
+  const [TranslateY,SetTranslateY] = useState(0)
+  const [leftsideshow,Setleftsideshow] = useState(true)
+  const [helper,SetHelper] = useState(1)
+  const [mode,setmode ] = useState("pen")
+let cordxerraser = useRef({x : 0,y:0})
+
   useEffect(() => {
     const handleWheel = (e) => {
       e.preventDefault();
@@ -74,6 +83,7 @@ const RenderBoardOptimiaztion = () => {
       canvas.current.height = rect.height * dpr;
       ctx.current = canvas.current.getContext("2d");
       ctx.current.setTransform(dpr, 0, 0, dpr, 0, 0);
+     
     };
     resizeCanvas();
     window.addEventListener("resize", resizeCanvas);
@@ -81,25 +91,51 @@ const RenderBoardOptimiaztion = () => {
       window.removeEventListener("resize", resizeCanvas);
     };
   }, []);
+
+  // do functions for all things do otptimze the good 
   useEffect(() => {
     const handelkeydown = (event) => {
       let easy = Buffer.current;
       event.preventDefault();
+
       if (event.ctrlKey && event.key.toLowerCase() == "z") {
-        const newArray = easy.FuncEndo();
-        if (!newArray) return;
-        reset(document);
-        for (let i = 0; i < newArray.length; i++) {
-          DrawPoints(newArray[i], colorState, sizeLine, refrences);
+        console.log("undeo")
+       
+      const svg = document.getElementById('svg');
+      const paths = svg?.querySelectorAll('g'); 
+      const lastPath = paths[paths.length - 1]
+ 
+      const lastpathf =lastPath?.querySelector("path") 
+       
+ 
+       
+      if(lastPath){
+           const dataline  = {
+          path : lastpathf?.getAttribute("d") , 
+          color : lastpathf?.getAttribute('stroke') ,
+          size : lastpathf?.getAttribute('stroke-width')
         }
+ 
+
+
+         easy.handelTrash(dataline)
+         lastPath.remove()
+        }
+      
       }
+
+
+      
       if (event.ctrlKey && event.key.toLowerCase() == "v") {
-        const newArray = easy.FuncRendo();
-        if (!newArray) return;
-        reset(document);
-        for (let i = 0; i < newArray.length; i++) {
-          DrawPoints(newArray[i], colorState, sizeLine, refrences);
-        }
+           console.log("ctrlv")
+         const objectOfpath =  easy.handelrendo()
+         if(objectOfpath)  {  
+            const {path,color,size} = objectOfpath
+           DrawPoints(path,color,size);
+   
+
+         }
+
       }
     };
     document.addEventListener("keydown", handelkeydown);
@@ -110,7 +146,9 @@ const RenderBoardOptimiaztion = () => {
   useEffect(()=>{
     const ListenClick = ()=>{
       SetShowSetting(false)
- SetShowFirstBox(false)
+      SetShowFirstBox(false)
+      SetShow(false)
+       
     }
       draw.current.addEventListener("click",ListenClick)
 
@@ -119,13 +157,91 @@ const RenderBoardOptimiaztion = () => {
       }
   },[])
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// do reaction and soound team board
+// SAVE data in localStorage
+// add block of p text please
+
+
+let fastcount = useRef(0)
   const HandelMove = (e) => {
+
+  const BoundriesDrawx = draw.current.getBoundingClientRect();
+ 
+
+    if(ErraserMode.current){
+           
+            if(fastcount.current>33){
+               fastcount.current = 0
+                ctx.current.clearRect(0, 0, canvas.current.width, canvas.current.height);
+
+            } 
+     
+          const x1 = e.clientX - BoundriesDrawx.left;
+          const y2 = e.clientY - BoundriesDrawx.top
+          cordxerraser.current.x = x1 
+          cordxerraser.current.y = y2 
+
+
+
+          let midxx =  (cordxerraser.current.x + x1) / 2;
+          let midyy =  (cordxerraser.current.y + y2) / 2;
+          
+         
+
+          quadrticCurver(
+            ctx.current, 
+            cordxerraser.current.x,
+            cordxerraser.current.y,
+            midxx,
+            midyy,
+            x1,
+            y2,
+            "#b0b1b5",
+            10,
+          );
+          fastcount.current+=1
+          
+
+    }
+ 
+    // const xx = e.clientX -draw.current.getBoundingClientRect().left
+    // const yy = e.clientY -draw.current.getBoundingClientRect().top
+    
+    // !isDrawingState.current  &&    drawCircle(ctx.current,xx,yy,12,"#808080",1,canvas.current.width, canvas.current.height)
+
     if (!isDrawingState.current || ErraserMode.current) return;
+    // show  &&   SetShow(false)
+
+
     const BoundriesDraw = draw.current.getBoundingClientRect();
+
+
     const events = e.getCoalescedEvents?.() || [e];
     for (let i = 0; i < events.length; i++) {
+
       const x = events[i].clientX - BoundriesDraw.left;
       const y = events[i].clientY - BoundriesDraw.top;
+   
       const dx = x - cord.current.x;
       const dy = y - cord.current.y;
       const distance = Math.sqrt(dx * dx + dy * dy);
@@ -148,40 +264,195 @@ const RenderBoardOptimiaztion = () => {
       cord.current.y = y;
     }
   };
+
+
+
+
+
+ 
+
+
+
+
+
   const HandelDown = (e) => {
     isDrawingState.current = true;
-    const BoundriesDraw = draw.current.getBoundingClientRect();
+ 
+    
+    const BoundriesDraw = canvas.current.getBoundingClientRect();
+    // ctx.current.clearRect(0, 0, canvas.current.width, canvas.current.height);
     const { clientX, clientY } = e;
     const x = clientX - BoundriesDraw.left;
     const y = clientY - BoundriesDraw.top;
+    // drawCircles(ctx.current, x,y, sizeLine, colorState, sizeLine) off it
     cord.current.x = x;
+    
     cord.current.y = y;
+
+    // cordxerraser.current.x = x 
+    // cordxerraser.current.y = y 
   };
-  const refrences = (e) => {
-    if (!ErraserMode.current) return;
-    if(ErraserMode.current && isDrawingState.current){
-  const newArray = Buffer.current.Erraser(e);
-    if (!newArray) return;
-    reset(document);
-    for (let i = 0; i < newArray.length; i++) {
-      DrawPoints(newArray[i], colorState, sizeLine, refrences);
-    }
-    }
-  
-  };
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+function clear(){
+     const rect = draw.current.getBoundingClientRect();
+      const dpr = window.devicePixelRatio || 1;
+      canvas.current.width = rect.width * dpr;
+      canvas.current.height = rect.height * dpr;
+      ctx.current = canvas.current.getContext("2d");
+      ctx.current.setTransform(dpr, 0, 0, dpr, 0, 0);
+}
+
+
+
+
+
+
+
+
+
   const HandelPointerUp = (e) => {
+     clear()
+ 
+    if(ErraserMode.current){
+      return 
+    }
     isDrawingState.current = false;
-    ctx.current.clearRect(0, 0, canvas.current.width, canvas.current.height);
+    
     let reduced = simplify(Points.current, 2);
     reduced.length > 0 && AllPath.current.push(reduced);
 
     const d = buildPath(reduced);
 
-    Buffer.current.pushItems([d]);
+       if(d==""){
+ 
+         const cx = cord.current.x; 
+         const cy = cord.current.y
+         const r = 5;  
+         const circlePath = `M ${cx + r}, ${cy} A ${r} ${r} 0 1 0 ${cx - r} ${cy} A ${r} ${r} 0 1 0 ${cx + r} ${cy} `;
+           const batman  = {
+             path : circlePath , 
+             color : colorState,
+             size : sizeLine
+           }
+ 
+          Buffer.current.HandelPushPaths(batman)
+          DrawPoints(circlePath, colorState, sizeLine);
+        
+       }
 
-    DrawPoints(d, colorState, sizeLine, refrences);
+
+    if(d=="") return
+    
+    const CollectLine  = {
+      path : d , 
+      color : colorState,
+      size : sizeLine
+    }
+   
+    Buffer.current.HandelPushPaths(CollectLine)
+   
+    DrawPoints(d, colorState, sizeLine);
     Points.current = [];
+   
+    
   };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// fixing bug by force it        style={{zIndex:ErraserMode.current ? "0":"1"}} 
+
+
   const handelChangeColor = (color) => {
  
     SetShow(false);
@@ -189,22 +460,40 @@ const RenderBoardOptimiaztion = () => {
   };
   const HandelFuture = () => {
     let easy = Buffer.current;
-    const newArray = easy.FuncRendo();
-    if (!newArray) return;
-    reset(document);
-    for (let i = 0; i < newArray.length; i++) {
-      DrawPoints(newArray[i], colorState, sizeLine, refrences);
-    }
+   
+       const objectOfpath =  easy.handelrendo()
+         if(objectOfpath)  {  
+            const {path,color,size} = objectOfpath
+           DrawPoints(path,color,size);
+         }
   };
   const HandelPasst = () => {
     let easy = Buffer.current;
-    const newArray = easy.FuncEndo();
-    if (!newArray) return;
-    reset(document);
-    for (let i = 0; i < newArray.length; i++) {
-      DrawPoints(newArray[i], colorState, sizeLine, refrences);
-    }
-  };  
+
+
+      
+      const svg = document.getElementById('svg');
+      const paths = svg?.querySelectorAll('g'); 
+      const lastPath = paths[paths.length - 1]
+ 
+      const lastpathf =lastPath?.querySelector("path") 
+       
+ 
+       
+      if(lastPath){
+           const dataline  = {
+          path : lastpathf?.getAttribute("d") , 
+          color : lastpathf?.getAttribute('stroke') ,
+          size : lastpathf?.getAttribute('stroke-width')
+        }
+ 
+
+
+         easy.handelTrash(dataline)
+         lastPath.remove()
+        }
+  
+  } 
   const HandelChangeGrid = (type)=>{
     if(type =="noGrid"){
        draw.current.style.backgroundColor = '#121212';
@@ -241,39 +530,117 @@ const RenderBoardOptimiaztion = () => {
 
  },[])
  const HandelOption = (type) =>{
- 
+     if(type=="HideNavbar"){
+      sethidenavbar((prev)=>!prev)
+      SetShowSetting(false)
+      Setleftsideshow((prev)=>!prev)
+     }
   if(type=="grid"){
     SetShowFirstBox(true)
   }
  }
+   
  
+ 
+
+
+ const handelMouseUp = ()=>{
+  isDrawingState.current = false 
+  
+ }
+ // do search if you can imedtily delte the item
+ const handelPointerLine = (e)=>{
+      
+    const  {d,stroke} = e.target.attributes
+    const strokeWidth = e.target.getAttribute('stroke-width');
+    const BoundriesDraw = canvas.current.getBoundingClientRect();
+    const { clientX, clientY } = e;
+    const x = clientX - BoundriesDraw.left;
+    const y = clientY - BoundriesDraw.top;
+    cord.current.x = x;
+    cord.current.y = y;
+
+    const LinesCord = {
+      path:d.value,
+      color:stroke.value,
+      size:Number(strokeWidth)
+
+    }
+    Buffer.current.handelTrash(LinesCord)
+ 
+   
+ 
+//  e.target.style.transform ="translate(40px,40px)"
+     e.target.remove()
+     console.log(e.target)
+    
+  
+ 
+ }
+ 
+  function baaaaaatamn  (mode){
+    switch(mode){
+      case "pencil":
+        return "d.png"
+      case  "pen":
+        return "b.png"
+      case "eraser":
+        return "h.png"
+    }
+  }
+   //onMouseEnter={()=>  ctx.current.clearRect(0, 0, canvas.current.width, canvas.current.height)}
 
   return (
     <>
+     
+      {hidenavbar &&  
       <div className="navbar">
         <span className="o">
           OpenSourceX {numberOfPage.current}
           <img src="openSource.png" alt="logo" />
         </span>
 
-        <span>Untitled</span>
+        <span >Untitled</span>
+     
         <button >Share</button>
-      </div>
+      </div> }
 
-      <div className="draw" ref={draw}>
+      <div className="draw"
+      style={{ cursor: `url('./controllers/${baaaaaatamn(mode)}') 3 32, auto` }}
+      ref={draw}>
         <canvas
           id="Layer1"
           ref={canvas}
           onPointerMove={(e) => HandelMove(e)}
           onPointerDown={(e) => HandelDown(e)}
           onPointerUp={(e) => HandelPointerUp(e)}
+          style={{zIndex:ErraserMode.current ? "0":"1"}}
         ></canvas>
 
-        <svg id="Layer2"></svg>
+ 
+        <svg id="svg"
+        
+        onMouseUp={()=>handelMouseUp()}
+        onPointerMove={(e)=>handelPointerLine(e)}>
+
+          {/* <g style={{ transform: `translate(${TranslateX}px, ${TranslateY}px)` }}>
+
+          </g> */}
+        </svg>  
+
+
+
+
       </div>
 
-      <div className="leftSide">
+    {leftsideshow && 
+    
+      <div className="leftSide" onPointerEnter={()=>{
 
+      isDrawingState.current = false
+
+      }}>
+ 
 
         <div className="FatherImages" draggable={false}>
           <img src="./leftSIdeImages/a.svg" draggable={false} />
@@ -287,15 +654,28 @@ const RenderBoardOptimiaztion = () => {
           onClick={() => {
             SetShow((prev) => !prev)
             ErraserMode.current = false
+            SetHelper((prev)=>prev+1)
+            isDrawingState.current = false
+            setmode("pen")
+            ctx.current.clearRect(0, 0, canvas.current.width, canvas.current.height);
           }}
 
         >
           <img src="./leftSIdeImages/b.svg" draggable={false} />
         </div>
-          <div className="FatherImages" onClick={() => (ErraserMode.current = true)}>
+          <div className="FatherImages" onClick={() => {
+            ErraserMode.current = true
+            SetHelper((prev)=>prev+1)
+
+            setmode("eraser")
+
+          }}>
          <img src="./leftSIdeImages/f.svg" draggable={false} />
         </div>
-      
+       <div className="FatherImages" onClick={() => reset(document)}>
+
+         <img src="./leftSIdeImages/h.svg" draggable={false} />
+        </div>
 
         <div className="FatherImages">
           <img src="./leftSIdeImages/d.svg" draggable={false} />
@@ -312,6 +692,9 @@ const RenderBoardOptimiaztion = () => {
       
 
       </div>
+      
+      
+      }
       {show && (
         <div className="pickColor">
           <div className="range1">

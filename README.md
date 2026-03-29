@@ -1,4 +1,6 @@
  # 🎨 Drawer App — Turn Ideas into Art
+[Watch the FlowDraw demo video](https://res.cloudinary.com/dfmdgsiid/video/upload/v1774754453/show_uj4dj2.mp4)
+
 
 Welcome to **Drawer App**, a simple yet powerful playground where creativity meets code.
 This project is built for anyone who loves sketching, experimenting, and bringing ideas to life—one stroke at a time.
@@ -27,11 +29,16 @@ Here’s a glimpse of what you can expect:
 <img src="./githubPic/e.png"></img>
 <img src="./githubPic/b.png"></img>
 <img src="./githubPic/a.png"></img>
+<img width="1033" height="545" alt="image" src="https://github.com/user-attachments/assets/fcb32b37-0f0c-4b69-9b02-401e817a3cc5" />
+<img width="1900" height="863" alt="image" src="https://github.com/user-attachments/assets/264c4e7e-448f-4f32-8870-f77a16c009a7" />
 <img src="./githubPic/c.png"></img>
 <img src="./githubPic/d.png"></img>
 <img src="./githubPic/g.png"></img>
  
- 
+ <video class="my-video" controls autoplay loop muted>
+      <source src="./public/videoshow/show.mp4" type="video/mp4">
+    
+ </video>
 
 
 ---

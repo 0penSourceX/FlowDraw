@@ -18,8 +18,8 @@ const Grid = ({passValue}) => {
 
         <input type="radio" name="plan" id="glass-platinum" />
         <label htmlFor="glass-platinum" onClick={()=>passValue("Dot")}>
-           <img src='/leftSIdeImages/dot.svg'/>
-          Dot Grid</label>
+       <img src='/leftSIdeImages/dot.svg'/>  Dot Grid</label>
+
         <div className="glass-glider" />
       </div>
     </StyledWrapper>
