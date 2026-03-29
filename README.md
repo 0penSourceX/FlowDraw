@@ -34,7 +34,7 @@ Here’s a glimpse of what you can expect:
 <img src="./githubPic/g.png"></img>
  
  <video class="my-video" controls autoplay loop muted>
-      <source src="./public/videoshow/show.webm" type="video/webm">
+      <source src="./public/videoshow/show.mp4" type="video/mp4">
     
  </video>
 
