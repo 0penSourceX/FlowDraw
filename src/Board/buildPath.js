@@ -11,7 +11,7 @@ export function buildPath(points) {
   }
 
   if (points.length === 3) {
-    return `M ${points[0].x} ${points[0].y} Q ${points[1].x} ${points[1].y} ${points[2].x} ${points[2].y}`;
+    return `M ${points[0].x} ${points[0].y} Q ${points[1].x} ${points[1].y} ${points[1].x} ${points[1].y} Q ${points[1].x} ${points[1].y} ${points[2].x} ${points[2].y} `;
   }
   if(points.length ===4){
       let d = `M${points[0].x} ${points[0].y}`;
