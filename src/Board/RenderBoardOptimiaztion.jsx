@@ -1,22 +1,22 @@
 import { useEffect, useRef, useState } from "react";
  
 import "./RenderBoardOptimiaztion.css";
-import { quadrticCurver } from "./quadrticCurver";
+import { quadrticCurver } from "../utils/quadrticCurver";
 import { simplify } from "./simplify";
-import { buildPath } from "./buildPath";
-import { DrawPoints } from "./DrawPoints";
-import { Path } from "./PathQuee";
+import { buildPath } from "../utils/buildPath";
+import { DrawPoints } from "../utils/DrawPoints";
+import { Path } from "../utils/PathQuee";
 import { reset } from "./rest";
 import { Colors } from "../BufferColor";
 import CompPrams from "../Pramas/CompPrams";
 import Button from "../Pramas/Setting";
 import Setting from "../Pramas/Setting";
 import Grid from "../Pramas/Grid";
-import { drawCircle } from "./darwCircle";
-import { drawCircles } from "./circleDrawSpecial";
-import { DrawText } from "./addtext";
-import { getDynamicLineWidth } from "./dynamicline";
- 
+import { drawCircle } from "../utils/darwCircle";
+import { drawCircles } from "../utils/circleDrawSpecial";
+import { DrawText } from "../utils/addtext";
+import { getDynamicLineWidth } from "../utils/dynamicline";
+import SettingsModal from "../Pramas/SettingsModal"
 const RenderBoardOptimiaztion = () => {
  
  let HelperSlide = useRef({x:0,y:0})
@@ -136,8 +136,21 @@ const handelsvgdown = (e)=>{
 
 
 
+useEffect(()=>{
+
+  const HandelContextMenu = (e)=>{
+     isDrawingState.current = false
+    console.log("this event fired")
+  } 
+
+  window.addEventListener("contextmenu",HandelContextMenu)
 
 
+return()=>{
+  window.removeEventListener("contextmenu",HandelContextMenu)
+}
+
+},[])
 
 
 
@@ -489,7 +502,7 @@ function clear(){
 
     const d = buildPath(reduced);
 
-       if(d=="" &&  cursormode.current ==false && textmode.current == false){
+       if(d=="" &&  cursormode.current ==false && textmode.current == false && isDrawingState.current == true){
  
          const cx = cord.current.x; 
          const cy = cord.current.y
@@ -617,13 +630,13 @@ function clear(){
   
   } 
   const HandelChangeGrid = (type)=>{
-    if(type =="noGrid"){
-       draw.current.style.backgroundColor = '#121212';
+    if(type =="none"){
+      //  draw.current.style.backgroundColor = '#121212';
        draw.current.style.backgroundImage = 'none';
        draw.current.style.backgroundSize = '';
        draw.current.style.backgroundPosition = '';
     }
-    else if (type =="Linegrid"){
+    else if (type =="line"){
        draw.current.style.backgroundColor = 'rgb(228, 225, 225)';
        draw.current.style.backgroundSize = '40px 40px';
        draw.current.style.backgroundImage = `
@@ -631,7 +644,7 @@ function clear(){
       linear-gradient(to bottom, #d2caca 1px, transparent 1px)
     ` 
     }
-    else if(type =="Dot"){
+    else if(type =="dot"){
     draw.current.style.backgroundColor = 'rgb(228, 225, 225)';
     draw.current.style.backgroundImage = 'radial-gradient(rgba(5, 4, 4, 0.17) 2px, transparent 0)';
     draw.current.style.backgroundSize = '30px 30px';
@@ -715,7 +728,10 @@ useEffect(()=>{
 
 
 
-
+const handelcolortheme = (bgcolor) =>{
+  console.log(bgcolor)
+  draw.current.style.backgroundColor = bgcolor;
+}
 
 
 
@@ -866,7 +882,7 @@ if ((e.key !== "Backspace" && /^[a-zA-Z]$/.test(e.key)) || e.key==" ") {
        document.removeEventListener("keydown", handelinput);
     };
 },[])
- 
+ // change sexy controlle panel
   return (
     <>
      
@@ -1041,8 +1057,16 @@ if ((e.key !== "Backspace" && /^[a-zA-Z]$/.test(e.key)) || e.key==" ") {
    
     {ShowSetting &&   <CompPrams onpassvalue={(e)=>HandelOption(e)}/>   }
      {!ShowSetting &&  <Setting send ={()=>SetShowSetting(true)}/>}
-
-      {showFirstBox &&      <Grid passValue ={(e)=>HandelChangeGrid(e)}/>}
+      {/* {showFirstBox &&      <Grid passValue ={(e)=>HandelChangeGrid(e)}/>} */}
+      {showFirstBox &&   
+     <SettingsModal 
+       typecolor={"black"}
+       HandelTehme ={(e)=>HandelChangeGrid(e)}
+       HandelTbgcolor ={(e)=>handelcolortheme(e)}
+       />
+       
+       
+       }
     </>
   );
 };
