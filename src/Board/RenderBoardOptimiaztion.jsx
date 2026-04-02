@@ -24,7 +24,8 @@ const RenderBoardOptimiaztion = () => {
 
  
 
-
+ const [bgcolor,SetbgColor] = useState(()=> localStorage.getItem("theme") || undefined)
+ const [grid,setgrid] = useState(()=> localStorage.getItem("grid") || undefined)
  
   const draw = useRef(null);
   const canvas = useRef(null);
@@ -690,15 +691,18 @@ function clear(){
         }
   
   } 
+
+ 
   const HandelChangeGrid = (type)=>{
+  
     if(type =="none"){
-      //  draw.current.style.backgroundColor = '#121212';
+       draw.current.style.backgroundColor = bgcolor;
        draw.current.style.backgroundImage = 'none';
        draw.current.style.backgroundSize = '';
        draw.current.style.backgroundPosition = '';
     }
     else if (type =="line"){
-       draw.current.style.backgroundColor = 'rgb(228, 225, 225)';
+       draw.current.style.backgroundColor =bgcolor;
        draw.current.style.backgroundSize = '40px 40px';
        draw.current.style.backgroundImage = `
       linear-gradient(to right, #d2caca 1px, transparent 1px),
@@ -706,7 +710,7 @@ function clear(){
     ` 
     }
     else if(type =="dot"){
-    draw.current.style.backgroundColor = 'rgb(228, 225, 225)';
+    draw.current.style.backgroundColor = bgcolor;
     draw.current.style.backgroundImage = 'radial-gradient(rgba(5, 4, 4, 0.17) 2px, transparent 0)';
     draw.current.style.backgroundSize = '30px 30px';
     draw.current.style.backgroundPosition = '-5px -5px';
@@ -717,12 +721,8 @@ function clear(){
   }
 
  useEffect(()=>{
-    draw.current.style.backgroundColor = 'rgb(228, 225, 225)';
-       draw.current.style.backgroundSize = '40px 40px';
-       draw.current.style.backgroundImage = `
-      linear-gradient(to right, #d2caca 1px, transparent 1px),
-      linear-gradient(to bottom, #d2caca 1px, transparent 1px)
-    ` 
+    draw.current.style.backgroundColor = bgcolor;
+    HandelChangeGrid(grid)
 
  },[])
  const HandelOption = (type) =>{

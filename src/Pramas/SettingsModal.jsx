@@ -7,10 +7,12 @@ const SettingsModal = ({typecolor ,HandelTehme,HandelTbgcolor,handelOffMOdule}) 
   const [grid, setGrid] = useState("line");
   useEffect(()=>{
     HandelTehme(grid)
+    localStorage.setItem("grid",grid)
   },[grid])
   const [theme, setTheme] = useState("#E4E1E1");
  useEffect(()=>{
     HandelTbgcolor(theme)
+    localStorage.setItem("theme",theme)
     console.log(theme)
   },[theme])
 
