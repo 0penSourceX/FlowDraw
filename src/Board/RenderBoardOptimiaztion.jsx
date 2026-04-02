@@ -17,6 +17,7 @@ import { drawCircles } from "../utils/circleDrawSpecial";
 import { DrawText } from "../utils/addtext";
 import { getDynamicLineWidth } from "../utils/dynamicline";
 import SettingsModal from "../Pramas/SettingsModal"
+import ShortcutsHint from "../Component/ShortcutsHint";
 const RenderBoardOptimiaztion = () => {
  
  let HelperSlide = useRef({x:0,y:0})
@@ -45,8 +46,7 @@ const RenderBoardOptimiaztion = () => {
   const [ShowSetting,SetShowSetting] = useState(false)
   const [showFirstBox,SetShowFirstBox] = useState(false)
   const [hidenavbar,sethidenavbar] = useState(true)
-  const [TranslateX,SetTranslateX] = useState(0)
-  const [TranslateY,SetTranslateY] = useState(0)
+   
   const [leftsideshow,Setleftsideshow] = useState(true)
   const [helper,SetHelper] = useState(1)
   const [mode,setmode ] = useState("pen")
@@ -62,8 +62,8 @@ const RenderBoardOptimiaztion = () => {
   const lastCordImage =useRef({x: 0 , y :0})
   const isMovingInfrastcture = useRef(false)
   const lastCordMoveImage =useRef({x: 0 , y :0})
-
-
+   
+  const [shortcut,Setshortcut] = useState(false)
 
  
 
@@ -112,7 +112,21 @@ const RenderBoardOptimiaztion = () => {
     };
   }, []);
 
-
+ useEffect(()=>{
+ const ProtectAfterRelod = () =>{
+  const arrayOfPath =  localStorage?.getItem("paths")
+  if(arrayOfPath){
+    const getSerlaizedArray = JSON.parse(arrayOfPath)
+     getSerlaizedArray.forEach(element => {
+      const {path,color,size} = element
+ 
+       DrawPoints(path, color, size);
+     });
+  }
+ }
+ ProtectAfterRelod()
+ 
+ },[])
 
 
 
@@ -206,7 +220,7 @@ return()=>{
     };
   }, []);
 
-  // do functions for all things do otptimze the good 
+ 
   useEffect(() => {
     const handelkeydown = (event) => {
       let easy = Buffer.current;
@@ -235,7 +249,25 @@ return()=>{
          easy.handelTrash(dataline)
          lastPath.remove()
         }
-      
+
+      let arr = localStorage.getItem("paths")  
+      if(arr){
+        const removeLastChild = JSON.parse(arr)
+          removeLastChild.pop();
+          localStorage.setItem("paths", JSON.stringify(removeLastChild));
+          console.log("should bne redraw all thing")
+          reset(document)
+          removeLastChild.forEach((item)=>{
+            DrawPoints(item.path,item.color,item.size)
+          })
+          
+      }
+     
+
+ 
+
+
+
       }
 
 
@@ -262,6 +294,7 @@ return()=>{
       SetShowSetting(false)
       SetShowFirstBox(false)
       SetShow(false)
+      Setshortcut(false)
        
     }
       draw.current.addEventListener("click",ListenClick)
@@ -376,7 +409,7 @@ let fastcount = useRef(0)
       const dy = y - cord.current.y;
       const distance = Math.sqrt(dx * dx + dy * dy);
       const linewidth = getDynamicLineWidth({x:cord.current.x,y:cord.current.y}, {x,y})
-      console.log(linewidth,"line")
+     // console.log(linewidth,"line")
       if (distance < 2) return;
       const midx = (cord.current.x + x) / 2;
       const midy = (cord.current.y + y) / 2;
@@ -490,19 +523,19 @@ function clear(){
   const HandelPointerUp = (e) => {
      clear()
 
-   isMovingInfrastcture.current==false  
-   isDrawingState.current = false;
+    isMovingInfrastcture.current==false  
+    isDrawingState.current = false;
     if(ErraserMode.current){
       return 
     }
   
     
     let reduced = simplify(Points.current, 2);
-    reduced.length > 0 && AllPath.current.push(reduced);
+    
 
     const d = buildPath(reduced);
-
-       if(d=="" &&  cursormode.current ==false && textmode.current == false && isDrawingState.current == true){
+      // && isDrawingState.current == true 
+       if(d=="" &&  cursormode.current ==false && textmode.current == false ){
  
          const cx = cord.current.x; 
          const cy = cord.current.y
@@ -529,11 +562,25 @@ function clear(){
     }
    
     Buffer.current.HandelPushPaths(CollectLine)
-   
+ 
+    AllPath.current.push(CollectLine)
+
+
+    const pathsLocalStorage = localStorage.getItem("paths")
+
+
+    if(pathsLocalStorage ){
+      const merge  = JSON.parse(pathsLocalStorage)
+      merge.push(CollectLine)
+     
+    localStorage.setItem("paths", JSON.stringify(merge) )     
+    }else{
+     localStorage.setItem("paths",JSON.stringify(AllPath.current)) 
+    }
+  
     DrawPoints(d, colorState, sizeLine);
     Points.current = [];
-   
-    
+  
   };
 
 
@@ -673,6 +720,10 @@ function clear(){
   if(type=="grid"){
     SetShowFirstBox(true)
   }
+  if(type=="shortcut"){
+  SetShowFirstBox(false)
+  Setshortcut((prev)=>!prev)
+  }
  }
    
  
@@ -809,7 +860,24 @@ const handelcolortheme = (bgcolor) =>{
       setmode("eraser")
   }
   else if(typeTagName=="path" && ErraserMode.current && isDrawingState.current==true) {
+ 
 
+     // delete from localStorage 
+     const PathRemoved = e.target.getAttribute("d")
+     const getAllDataLocalStorage = localStorage.getItem("paths")
+     
+     if(getAllDataLocalStorage){
+      const parsedata = JSON.parse(getAllDataLocalStorage)
+     
+      const filterValideData = parsedata.filter((item)=>item.path!=PathRemoved)
+      localStorage.setItem("paths",JSON.stringify(filterValideData))
+     }
+
+
+
+
+     
+      
       const  {d,stroke} = e.target.attributes
       const strokeWidth = e.target.getAttribute('stroke-width');
       const BoundriesDraw = canvas.current.getBoundingClientRect();
@@ -826,7 +894,7 @@ const handelcolortheme = (bgcolor) =>{
       }
       Buffer.current.handelTrash(LinesCord)
       e.target.remove()
-
+      
 
 }
     
@@ -866,12 +934,25 @@ const handelinput =(e)=>{
     String.current  = copyFromString.join("")
     setx((prev)=>prev+1)
   }
-  console.log(e.key, "mots")
  
-if ((e.key !== "Backspace" && /^[a-zA-Z]$/.test(e.key)) || e.key==" ") {
-  String.current += e.key;
-  setx((prev) => prev + 1);
-}
+  if(e.key.toLowerCase()=="e" && textmode.current == false){
+    ErraserMode.current = true
+    isDrawingState.current = false
+    setmode("eraser")
+    setx((prev)=>prev+1)
+
+  } 
+  if(e.key.toLowerCase()=="f" && !textmode.current)
+  {
+   ErraserMode.current = false
+   console.log("should be clear canva here")
+   setmode("pen")
+  setx((prev)=>prev+1)
+  }
+  if ((e.key !== "Backspace" && /^[a-zA-Z]$/.test(e.key)) || e.key==" ") {
+    String.current += e.key;
+    setx((prev) => prev + 1);
+  }
 
 
 
@@ -882,7 +963,12 @@ if ((e.key !== "Backspace" && /^[a-zA-Z]$/.test(e.key)) || e.key==" ") {
        document.removeEventListener("keydown", handelinput);
     };
 },[])
- // change sexy controlle panel
+ 
+// in spec mode do false to drawing
+
+ const handelOffMOdulex = ()=>{
+   SetShowFirstBox(false)
+ }
   return (
     <>
      
@@ -1055,18 +1141,21 @@ if ((e.key !== "Backspace" && /^[a-zA-Z]$/.test(e.key)) || e.key==" ") {
         </div>
       )}
    
-    {ShowSetting &&   <CompPrams onpassvalue={(e)=>HandelOption(e)}/>   }
+    {ShowSetting &&   <CompPrams onpassvalue={(e)=>HandelOption(e) }  isHidenavbar = {hidenavbar} />   }
      {!ShowSetting &&  <Setting send ={()=>SetShowSetting(true)}/>}
-      {/* {showFirstBox &&      <Grid passValue ={(e)=>HandelChangeGrid(e)}/>} */}
+      
       {showFirstBox &&   
      <SettingsModal 
        typecolor={"black"}
        HandelTehme ={(e)=>HandelChangeGrid(e)}
-       HandelTbgcolor ={(e)=>handelcolortheme(e)}
+       HandelTbgcolor ={(e)=>handelcolortheme(e) }
+       handelOffMOdule = {()=>handelOffMOdulex()}
+
        />
        
        
        }
+      {shortcut && <ShortcutsHint show ={shortcut}/>}
     </>
   );
 };

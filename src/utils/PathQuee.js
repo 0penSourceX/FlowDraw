@@ -23,5 +23,8 @@ export class Path {
     return getitem 
  }
 
+ getcurrentPaths (){
+    return this.array
+ }
 
 }

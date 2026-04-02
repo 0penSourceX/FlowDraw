@@ -3,7 +3,7 @@ import "./SettingsModal.css";
 import { useEffect } from "react";
 import { Colors } from "../BufferColor";
 
-const SettingsModal = ({typecolor ,HandelTehme,HandelTbgcolor}) => {
+const SettingsModal = ({typecolor ,HandelTehme,HandelTbgcolor,handelOffMOdule}) => {
   const [grid, setGrid] = useState("line");
   useEffect(()=>{
     HandelTehme(grid)
@@ -30,7 +30,7 @@ const SettingsModal = ({typecolor ,HandelTehme,HandelTbgcolor}) => {
         {/* Header */}
         <div className="header">
           <span style={{color:typecolor=="white"?"white":"black"}}>Settings</span>
-          <button className="close">
+          <button className="close" onClick={()=>handelOffMOdule()}>
             <svg width="14" height="14" viewBox="0 0 24 24">
               <path d="M6 6L18 18M18 6L6 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
             </svg>

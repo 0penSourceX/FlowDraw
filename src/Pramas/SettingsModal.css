@@ -6,7 +6,7 @@
   align-items: center;
   justify-content: center;
   background:transparent;
- 
+  user-select: none;
   position: relative;
   overflow: hidden;
   position: absolute; 
@@ -17,6 +17,7 @@
   border: 1.5px solid rgb(191, 182, 182);
   border-radius: 10px;
   font-family:monospace;
+  
 }
 
 /* dotted background like screenshot */
