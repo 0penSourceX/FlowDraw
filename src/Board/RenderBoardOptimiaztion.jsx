@@ -642,12 +642,26 @@ function clear(){
   };
   const HandelFuture = () => {
     let easy = Buffer.current;
-   
+  
        const objectOfpath =  easy.handelrendo()
          if(objectOfpath)  {  
             const {path,color,size} = objectOfpath
            DrawPoints(path,color,size);
+
+
+    const pathsLocalStorage = localStorage.getItem("paths")
+
+
+    if(pathsLocalStorage ){
+      const merge  = JSON.parse(pathsLocalStorage)
+      merge.push(objectOfpath)
+     
+    localStorage.setItem("paths", JSON.stringify(merge) )     
+    }
+
+
          }
+
   };
   const HandelPasst = () => {
     let easy = Buffer.current;
