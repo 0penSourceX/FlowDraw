@@ -1208,7 +1208,7 @@ const withBzierCurve   = () =>{
                 key={color}
                 className="circle-c"
                 style={{ backgroundColor: color }}
-              ></div>
+               ></div>
             ))}
           </div>
         </div>
