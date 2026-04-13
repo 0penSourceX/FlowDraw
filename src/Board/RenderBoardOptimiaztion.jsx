@@ -1231,9 +1231,7 @@ const withBzierCurve   = () =>{
       {shortcut && <ShortcutsHint show ={shortcut}/>}
       { !ShowReaction &&  <Reaction/>}
       
-       <div className="zoom" onClick ={()=>handelZoom()}>
-        <span>+</span>
-       </div>
+      
      
     </>
   );
