@@ -9,7 +9,7 @@ export class Path {
  
     HandelPushPaths(ObjectOfPath){
         this.array.push(ObjectOfPath)
-          console.log(this.array)
+        
     }
 
     handelTrash(v)

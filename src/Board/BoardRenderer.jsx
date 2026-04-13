@@ -1,12 +1,12 @@
 import { useEffect, useRef, useState } from "react";
  
-import "./RenderBoardOptimiaztion.css";
+import "./BoardRenderer.css";
 import { quadrticCurver } from "../utils/quadrticCurver";
-import { simplify } from "./simplify";
+import { simplify } from "../utils/simplify";
 import { buildPath } from "../utils/buildPath";
 import { DrawPoints } from "../utils/DrawPoints";
 import { Path } from "../utils/PathQuee";
-import { reset } from "./rest";
+import { reset } from "../utils/rest";
 import { Colors } from "../BufferColor";
 import CompPrams from "../Pramas/CompPrams";
 import Button from "../Pramas/Setting";
@@ -23,21 +23,18 @@ import { uploadToCloudinary } from "../utils/uploadToCloudinary";
 
 
 
-const RenderBoardOptimiaztion = () => {
+const BoardRenderer = () => {
   
  
- let HelperSlide = useRef({x:0,y:0})
- const [ShowReaction,SetShoReaction]= useState(true)
- 
- const storecurrent = useRef(null)
- const [bgcolor,SetbgColor] = useState(()=> localStorage.getItem("theme") || "rgb(242, 201, 76)")
- const [grid,setgrid] = useState(()=> localStorage.getItem("grid") || "dot")
- 
+  let HelperSlide = useRef({x:0,y:0})
+  const [ShowReaction,SetShoReaction]= useState(true)
+  const storecurrent = useRef(null)
+  const [bgcolor,SetbgColor] = useState(()=> localStorage.getItem("theme") || "rgb(242, 201, 76)")
+  const [grid,setgrid] = useState(()=> localStorage.getItem("grid") || "dot")
   const draw = useRef(null);
   const canvas = useRef(null);
   const ctx = useRef(null);
   const Points = useRef([]);
-
   const isDrawingState = useRef(false);
   const [_, setx] = useState(0);
   const calc = useRef(0);
@@ -46,56 +43,58 @@ const RenderBoardOptimiaztion = () => {
   const AllPath = useRef([]);
   let Buffer = useRef(new Path());
   let ErraserMode = useRef(false);
-
   const [sizeLine, setSizeLine] = useState(7);
   const [colorState, SetColorState] = useState("green");
   const [show, SetShow] = useState(false);
   const [ShowSetting,SetShowSetting] = useState(false)
   const [showFirstBox,SetShowFirstBox] = useState(false)
   const [hidenavbar,sethidenavbar] = useState(true)
-   
   const [leftsideshow,Setleftsideshow] = useState(true)
   const [helper,SetHelper] = useState(1)
   const [mode,setmode ] = useState("pen")
-
   const textmode  = useRef(false)
   const cursormode = useRef(false)
   let cordxerraser = useRef({x : 0,y:0})
   const [clickabletext,Setclickabletext] = useState(false)
   const [newcord,setnewcord] = useState({x: 0 ,y : 0})
- 
   const String = useRef("")
-
   const lastCordImage =useRef({x: 0 , y :0})
   const isMovingInfrastcture = useRef(false)
   const lastCordMoveImage =useRef({x: 0 , y :0})
-   
   const [shortcut,Setshortcut] = useState(false)
-
   const [scale,setScale] = useState(1)
-
-
   const [images, setImages] = useState([]);
+  let isMoveView = useRef(false)
+
+  let fun = useRef({x : 0 , y : 0})
+  let cumulatefun = useRef({x : 0 , y : 0})
+
+
+ 
+
+
+
+
  
   useEffect(() => {
     const handlePaste = async (event) => {
       event.preventDefault();
 
       const items = event.clipboardData.items;
-      console.log(items,"this form clipboarddata")
-   // do  features dblcick 
+    
+   
       for (const item of items) {
         if (item.type.startsWith("image/")) {
           const blob = item.getAsFile();
-          console.log(blob)
           const response = await uploadToCloudinary(blob)
           console.log(response,"this should be working as response hahaha")
            const url = URL.createObjectURL(blob);
            const img = new Image();
+
           
           img.onload = () => {
-            console.log("Width:", img.width);
-            console.log("Height:", img.height);
+            console.log(lastCordImage.current.x,lastCordImage.current.y,"cord")
+      
                 
             document.querySelector("svg").innerHTML += `
             <g style=" transform: translate(${lastCordImage.current.x == 0 ? canvas.current.width/2 : lastCordImage.current.x-100}px, ${lastCordImage.current.y == 0 ? canvas.current.height : lastCordImage.current.y}px); pointer-events: stroke;"> 
@@ -121,6 +120,10 @@ const RenderBoardOptimiaztion = () => {
     };
   }, []);
 
+
+
+
+ 
  useEffect(()=>{
  const ProtectAfterRelod = () =>{
   const arrayOfPath =  localStorage?.getItem("paths")
@@ -162,10 +165,13 @@ const handelsvgdown = (e)=>{
 useEffect(()=>{
 
   const HandelContextMenu = (e)=>{
-     //e.preventDefault()
+     e.preventDefault()
      isDrawingState.current = false
-     console.log("this event fired")
-      
+     isMoveView.current = true
+      fun.current.x = e.pageX 
+      fun.current.y = e.pageY
+     console.log("this event fired",lastCordImage)
+     
   } 
 
   window.addEventListener("contextmenu",HandelContextMenu)
@@ -338,22 +344,57 @@ return()=>{
 
 let fastcount = useRef(0)
   const HandelMove = (e) => {
+ 
+
+    if(isMoveView.current){
+      
+      const maxX = 0;
+    
+      const widthMax = window.innerWidth -draw.current.scrollWidth
+      const heightMax = window.innerHeight -draw.current.scrollHeight
+
+
+     
+   
+      const dx = e.pageX - fun.current.x
+      const dy = e.pageY - fun.current.y
+
+      cumulatefun.current.x+=dx
+      cumulatefun.current.y+=dy
+      cumulatefun.current.x = Math.min(maxX,Math.max(cumulatefun.current.x,widthMax))
+      cumulatefun.current.y = Math.min(0, Math.max(cumulatefun.current.y,heightMax));
+      const box = document.querySelector(".draw");
+ 
+  
+    
+     // box.style.transition = "transform 0.2s ease";
+      box.style.transform = `translate(${cumulatefun.current.x}px,${0}px)`;
+
+    
+      fun.current.x = e.pageX 
+      fun.current.y = e.pageY
+
+    }
+
+
+
+
+
+
 
 
        
-    const boundriesimages = draw.current.getBoundingClientRect();
- 
- 
- 
-
-      const x = e.clientX - boundriesimages.left;
-      const y = e.clientY - boundriesimages.top;
-
-      lastCordImage.current.x = x 
-      lastCordImage.current.y = y 
+    const boundriesimages = draw.current.getBoundingClientRect()
+    const x = e.clientX - boundriesimages.left;
+    const y = e.clientY - boundriesimages.top;
+    lastCordImage.current.x = x 
+    lastCordImage.current.y = y 
       
        
  
+
+
+
 
 
  
@@ -416,7 +457,7 @@ let fastcount = useRef(0)
         
         const distance = Math.sqrt(dx * dx + dy * dy);
    
-      if (distance <2) return;
+     // if (distance <2) return;
 
         const midx = (cord.current.x + x) / 2;
         const midy = (cord.current.y + y) / 2;
@@ -432,17 +473,7 @@ let fastcount = useRef(0)
 
 
 
-
-
-
-
-
-
-
-
-
-
-
+ 
 
 
   }
@@ -551,25 +582,25 @@ function clear(){
  
     const d = buildPath(reduced);
       // && isDrawingState.current == true 
-       if(d=="" &&  cursormode.current ==false && textmode.current == false ){
+    //    if(d=="" &&  cursormode.current ==false && textmode.current == false ){
  
-         const cx = cord.current.x; 
-         const cy = cord.current.y
-         const r = 1;  
-         const circlePath = `M ${cx + r}, ${cy} A ${r} ${r} 0 1 0 ${cx - r} ${cy} A ${r} ${r} 0 1 0 ${cx + r} ${cy} `;
-           const batman  = {
-             path : circlePath , 
-             color : colorState,
-             size : sizeLine
-           }
+    //      const cx = cord.current.x; 
+    //      const cy = cord.current.y
+    //      const r = 1;  
+    //      const circlePath = `M ${cx + r}, ${cy} A ${r} ${r} 0 1 0 ${cx - r} ${cy} A ${r} ${r} 0 1 0 ${cx + r} ${cy} `;
+    //        const batman  = {
+    //          path : circlePath , 
+    //          color : colorState,
+    //          size : sizeLine
+    //        }
  
-          Buffer.current.HandelPushPaths(batman)
-          DrawPoints(circlePath, colorState, sizeLine);
+    //       Buffer.current.HandelPushPaths(batman)
+    //       DrawPoints(circlePath, colorState, sizeLine);
         
-       }
+    //    }
 
 
-    if(d=="") return
+    // if(d=="") return
     
     const CollectLine  = {
       path : d , 
@@ -621,24 +652,7 @@ function clear(){
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+ 
 
 
 
@@ -777,6 +791,8 @@ useEffect(()=>{
 
   const handel = ()=>{
   isMovingInfrastcture.current=false
+  isMoveView.current = false
+   
   
   }
   document.addEventListener("pointerup",handel)
@@ -827,6 +843,7 @@ const handelcolortheme = (bgcolor) =>{
  
        const  toTop = e.target.parentElement.style.transform;
        const match = toTop.match(/translate\(([^,]+),\s*([^)]+)\)/);
+
 
   
        if (match) {
@@ -1237,4 +1254,4 @@ const withBzierCurve   = () =>{
   );
 };
 
-export default RenderBoardOptimiaztion;
+export default BoardRenderer;

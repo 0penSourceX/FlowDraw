@@ -5,7 +5,7 @@
   background-color: #0D1117;
   justify-content: center;
   border-radius: 0px 5px 5px 5px;
-  position: absolute;
+  position: fixed;
   left:0;
   z-index: 99;
   top: 0;

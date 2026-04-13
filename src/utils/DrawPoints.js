@@ -17,7 +17,7 @@
   Gpath.style.transform = "translate(0px,0px)";
   const g = document.querySelector("svg");
   
-  console.log(Gpath)
+ 
   g.appendChild(Gpath)
   }
 

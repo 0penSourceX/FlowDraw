@@ -1,5 +1,5 @@
 .Seeting{
-    position: absolute;
+    position: fixed;
     top: 0;
     left: 0;
     z-index: 99;
@@ -21,7 +21,7 @@
 @media (max-width: 856px) {
   
 .Seeting{
-    position: absolute;
+    position: fixed;
     left: 0;
     bottom: 0;
     top: 90%;

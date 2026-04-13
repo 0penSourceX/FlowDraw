@@ -2,7 +2,7 @@
 
 .navbar{
     width:40%;
-    position: absolute;
+    position: fixed;
     top: 0;
     padding: 10px;
     z-index: 99;
@@ -16,6 +16,7 @@
     user-select: none;
     border-radius:6px;
     box-shadow: 2px 2px 2px grey;
+ 
     
 }
 .o{
@@ -68,7 +69,7 @@
    background-color: white;
    width: 20%;
    height: 45px;
-   position: absolute;
+   position: fixed;
    right: 0;
    z-index: 99;
    margin-top: 10px;
@@ -186,8 +187,8 @@ body{
 
 .draw{
    
-    width: 100%;
-    height:100vh;
+    width: 300%;
+    height:300vh;
    
     position: relative;
  
@@ -233,7 +234,7 @@ body{
     margin-left: 8px;
     background-color: white;
     height:auto;
-    position: absolute;
+    position: fixed;
     left: 0;
     z-index: 99;
     top: 50%;
@@ -362,7 +363,7 @@ body{
     margin-left: 8px;
     background-color: white;
     height: 70%;
-    position: absolute;
+    position: fixed;
     left: 0;
     z-index: 99;
     top: 50%;
@@ -372,7 +373,7 @@ body{
 
 .navbar{
     width: 90%;
-    position: absolute;
+    position: fixed;
     top: 0;
     padding: 10px;
     z-index: 99;
@@ -466,7 +467,7 @@ body{
     margin-left: 8px;
     background-color: white;
      height: 50%;
-    position: absolute;
+    position: fixed;
     left: 0;
     z-index: 99;
     top: 50%;
