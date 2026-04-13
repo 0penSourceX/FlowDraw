@@ -4,12 +4,13 @@ import { useEffect } from "react";
 import { Colors } from "../BufferColor";
 
 const SettingsModal = ({typecolor ,HandelTehme,HandelTbgcolor,handelOffMOdule}) => {
-  const [grid, setGrid] = useState("line");
+  
+  const [grid, setGrid] = useState(()=>localStorage.getItem("grid"));
   useEffect(()=>{
     HandelTehme(grid)
     localStorage.setItem("grid",grid)
   },[grid])
-  const [theme, setTheme] = useState("#E4E1E1");
+  const [theme, setTheme] = useState(()=>localStorage.getItem("theme"));
  useEffect(()=>{
     HandelTbgcolor(theme)
     localStorage.setItem("theme",theme)

@@ -18,14 +18,20 @@ import { DrawText } from "../utils/addtext";
 import { getDynamicLineWidth } from "../utils/dynamicline";
 import SettingsModal from "../Pramas/SettingsModal"
 import ShortcutsHint from "../Component/ShortcutsHint";
+import Reaction from "../Component/Reaction";
+import { uploadToCloudinary } from "../utils/uploadToCloudinary";
+
+
+
 const RenderBoardOptimiaztion = () => {
+  
  
  let HelperSlide = useRef({x:0,y:0})
-
+ const [ShowReaction,SetShoReaction]= useState(true)
  
-
- const [bgcolor,SetbgColor] = useState(()=> localStorage.getItem("theme") || undefined)
- const [grid,setgrid] = useState(()=> localStorage.getItem("grid") || undefined)
+ const storecurrent = useRef(null)
+ const [bgcolor,SetbgColor] = useState(()=> localStorage.getItem("theme") || "rgb(242, 201, 76)")
+ const [grid,setgrid] = useState(()=> localStorage.getItem("grid") || "dot")
  
   const draw = useRef(null);
   const canvas = useRef(null);
@@ -41,8 +47,8 @@ const RenderBoardOptimiaztion = () => {
   let Buffer = useRef(new Path());
   let ErraserMode = useRef(false);
 
-  const [sizeLine, setSizeLine] = useState(6);
-  const [colorState, SetColorState] = useState("#122d5c");
+  const [sizeLine, setSizeLine] = useState(7);
+  const [colorState, SetColorState] = useState("green");
   const [show, SetShow] = useState(false);
   const [ShowSetting,SetShowSetting] = useState(false)
   const [showFirstBox,SetShowFirstBox] = useState(false)
@@ -66,40 +72,42 @@ const RenderBoardOptimiaztion = () => {
    
   const [shortcut,Setshortcut] = useState(false)
 
- 
+  const [scale,setScale] = useState(1)
 
 
   const [images, setImages] = useState([]);
  
   useEffect(() => {
-    const handlePaste = (event) => {
+    const handlePaste = async (event) => {
       event.preventDefault();
 
       const items = event.clipboardData.items;
-  
+      console.log(items,"this form clipboarddata")
+   // do  features dblcick 
       for (const item of items) {
         if (item.type.startsWith("image/")) {
           const blob = item.getAsFile();
           console.log(blob)
-   
-          const url = URL.createObjectURL(blob);
+          const response = await uploadToCloudinary(blob)
+          console.log(response,"this should be working as response hahaha")
+           const url = URL.createObjectURL(blob);
            const img = new Image();
-
+          
           img.onload = () => {
             console.log("Width:", img.width);
             console.log("Height:", img.height);
                 
             document.querySelector("svg").innerHTML += `
             <g style=" transform: translate(${lastCordImage.current.x == 0 ? canvas.current.width/2 : lastCordImage.current.x-100}px, ${lastCordImage.current.y == 0 ? canvas.current.height : lastCordImage.current.y}px); pointer-events: stroke;"> 
-             <image   height=${img.height>800 ?  800:img.height}  width=${img.width>1700 ?  1700:img.width}  href=${url}  /> </g>`;
-            URL.revokeObjectURL(url); // clean up
+             <image   height=${img.height>800 ?  800:img.height}  width=${img.width>1700 ?  1700:img.width}  href=${response}  /> </g>`;
+            URL.revokeObjectURL(url);  
             };
            img.src = url;
 
 
    
 
-          setImages((prev) => [...prev, url]);
+          setImages((prev) => [...prev, response]);
         }
       }
 
@@ -154,8 +162,10 @@ const handelsvgdown = (e)=>{
 useEffect(()=>{
 
   const HandelContextMenu = (e)=>{
+     //e.preventDefault()
      isDrawingState.current = false
-    console.log("this event fired")
+     console.log("this event fired")
+      
   } 
 
   window.addEventListener("contextmenu",HandelContextMenu)
@@ -341,14 +351,12 @@ let fastcount = useRef(0)
 
       lastCordImage.current.x = x 
       lastCordImage.current.y = y 
+      
        
+ 
 
 
-
-
-
-
-   
+ 
     if(ErraserMode.current &&  textmode.current == false ){
 
     const BoundriesDrawx = draw.current.getBoundingClientRect();
@@ -387,56 +395,63 @@ let fastcount = useRef(0)
 
     }
  
-    //  const xx = e.clientX -draw.current.getBoundingClientRect().left
-    //  const yy = e.clientY -draw.current.getBoundingClientRect().top
-    // solution    !isDrawingState.current && !ErraserMode.current   &&  (  drawCircle(ctx.current,xx,yy,12,"#808080",1,canvas.current.width, canvas.current.height))
-    
-    // !isDrawingState.current  &&    drawCircle(ctx.current,xx,yy,12,"#808080",1,canvas.current.width, canvas.current.height)
 
-    if (!isDrawingState.current || ErraserMode.current ||  cursormode.current || textmode.current) return;
-    // show  &&   SetShow(false)
+ 
+ 
+       if (!isDrawingState.current || ErraserMode.current ||  cursormode.current || textmode.current) return;
+     
+ 
 
-       
-    const BoundriesDraw = draw.current.getBoundingClientRect();
-    // try to change the buzze curve with catmual curve to make the line moregood 
 
-    const events = e.getCoalescedEvents?.() || [e];
-    for (let i = 0; i < events.length; i++) {
+       // Reall Drawing                FreehandeBezierDrawing(draw,cord,Points)  FreehandeCatmualDrawing(draw,cord,Points)
+      
+       const BoundriesDraw = draw.current.getBoundingClientRect();
+       const events = e.getCoalescedEvents?.() || [e];
+       for (let i = 0; i < events.length; i++) {
 
-      const x = events[i].clientX - BoundriesDraw.left;
-      const y = events[i].clientY - BoundriesDraw.top;
+        const x =( events[i].clientX - BoundriesDraw.left)  
+        const y = (events[i].clientY - BoundriesDraw.top );
+        const dx = x - cord.current.x;
+        const dy = y - cord.current.y;
+        
+        const distance = Math.sqrt(dx * dx + dy * dy);
    
-      const dx = x - cord.current.x;
-      const dy = y - cord.current.y;
-      const distance = Math.sqrt(dx * dx + dy * dy);
-      const linewidth = getDynamicLineWidth({x:cord.current.x,y:cord.current.y}, {x,y})
-     // console.log(linewidth,"line")
-      if (distance < 2) return;
-      const midx = (cord.current.x + x) / 2;
-      const midy = (cord.current.y + y) / 2;
-      quadrticCurver(
-        ctx.current,
-        cord.current.x,
-        cord.current.y,
-        midx,
-        midy,
-        x,
-        y,
-        colorState,
-        sizeLine,
-      );
-      Points.current.push({ x, y });
-      cord.current.x = x;
-      cord.current.y = y;
-    }
-  };
+      if (distance <2) return;
+
+        const midx = (cord.current.x + x) / 2;
+        const midy = (cord.current.y + y) / 2;
+
+        quadrticCurver(ctx.current, cord.current.x, cord.current.y,midx,midy,x,y,colorState,sizeLine)
+        Points.current.push({ x, y })
+        cord.current.x = x
+        cord.current.y = y
+
+      }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  }
 
 
 
 
 
  
-
  
 
 
@@ -457,7 +472,7 @@ let fastcount = useRef(0)
     lastCordImage.current.y = y 
      if(textmode.current){
       console.log("this text mode",{x,y})
-     //   DrawText("we love porn hub",x,y,   "black",  33,  "start")
+     //   DrawText("we love   hub",x,y,   "black",  33,  "start")
     }
 
   };
@@ -522,18 +537,18 @@ function clear(){
 
 
   const HandelPointerUp = (e) => {
-     clear()
-
+    clear()  
     isMovingInfrastcture.current==false  
     isDrawingState.current = false;
     if(ErraserMode.current){
       return 
     }
   
-    
+   
     let reduced = simplify(Points.current, 2);
-    
-
+   
+    storecurrent.current =reduced
+ 
     const d = buildPath(reduced);
       // && isDrawingState.current == true 
        if(d=="" &&  cursormode.current ==false && textmode.current == false ){
@@ -696,13 +711,13 @@ function clear(){
   const HandelChangeGrid = (type)=>{
   
     if(type =="none"){
-       draw.current.style.backgroundColor = bgcolor;
+       draw.current.style.backgroundColor = type;
        draw.current.style.backgroundImage = 'none';
        draw.current.style.backgroundSize = '';
        draw.current.style.backgroundPosition = '';
     }
     else if (type =="line"){
-       draw.current.style.backgroundColor =bgcolor;
+       draw.current.style.backgroundColor =type;
        draw.current.style.backgroundSize = '40px 40px';
        draw.current.style.backgroundImage = `
       linear-gradient(to right, #d2caca 1px, transparent 1px),
@@ -710,7 +725,7 @@ function clear(){
     ` 
     }
     else if(type =="dot"){
-    draw.current.style.backgroundColor = bgcolor;
+    draw.current.style.backgroundColor = type;
     draw.current.style.backgroundImage = 'radial-gradient(rgba(5, 4, 4, 0.17) 2px, transparent 0)';
     draw.current.style.backgroundSize = '30px 30px';
     draw.current.style.backgroundPosition = '-5px -5px';
@@ -753,35 +768,14 @@ function clear(){
 
 
 
-useEffect(()=>{
-  const handelDocMove = (e)=>{
-
-    const boundriesimagess = draw.current.getBoundingClientRect();
  
-       const x = e.clientX - boundriesimagess.left;
-       const y = e.clientY - boundriesimagess.top;
-       lastCordMoveImage.current.x = x 
-       lastCordMoveImage.current.y = y
-     
-      
-      HelperSlide.current.x =x  
-      HelperSlide.current.y =y  
-     // console.log("moving throw the document")
-  }
-  document.addEventListener("pointermove",handelDocMove)
-  return()=>{
-      document.removeEventListener("pointermove",handelDocMove)
-  }
-},[])
-
-
 
 
 useEffect(()=>{
 
 
 
-  const handel = (e)=>{
+  const handel = ()=>{
   isMovingInfrastcture.current=false
   
   }
@@ -807,20 +801,7 @@ const handelcolortheme = (bgcolor) =>{
 
 
 
-
-
  
- 
-
-     
-
-
-
-
- 
-
-
-
 
 
 
@@ -836,31 +817,32 @@ const handelcolortheme = (bgcolor) =>{
   setmode("select")
  }
   if( typeTagName =="image"  && isMovingInfrastcture.current==true ){
-      
  
-      
-       let currentx = e.clientX
-       let currenty= e.clientY
  
-       let dx = e.clientX-HelperSlide.current.x
-       let dy = e.clientY-HelperSlide.current.y
-       console.log(dx,dy,"the value should be pass")
+
+
+       let dx = e.pageX-HelperSlide.current.x
+       let dy = e.pageY - HelperSlide.current.y;
+
+ 
        const  toTop = e.target.parentElement.style.transform;
-         setmode("grab")
-     
-         const match = toTop.match(/translate\(([^,]+),\s*([^)]+)\)/);
+       const match = toTop.match(/translate\(([^,]+),\s*([^)]+)\)/);
+
   
        if (match) {
          let x = parseFloat(match[1]); 
          let y = parseFloat(match[2]);
+     
   
           let newX = x+dx
           let newY = y+dy
           e.target.parentElement.style.transform = `translate(${newX}px, ${newY}px)`;  
+          e.target.parentElement.style.cursor = "grabbing";
          
-          HelperSlide.current.x = currentx
-          HelperSlide.current.y = currenty
-         console.log(x, y);
+
+          HelperSlide.current.x = e.pageX
+          HelperSlide.current.y = e.pageY
+        
       }
 
 
@@ -930,12 +912,11 @@ const handelcolortheme = (bgcolor) =>{
         return "whitegrap.png.png"
     }
   }
-   //onMouseEnter={()=>  ctx.current.clearRect(0, 0, canvas.current.width, canvas.current.height)}
  
 useEffect(()=>{
 
 const handelinput =(e)=>{
-
+ 
   if(e.ctrlKey  && e.key=="Backspace"){
     String.current  = ""
   }
@@ -978,29 +959,104 @@ const handelinput =(e)=>{
     };
 },[])
  
-// in spec mode do false to drawing
+ 
 
  const handelOffMOdulex = ()=>{
    SetShowFirstBox(false)
  }
+
+ 
+ 
+ const handelZoom = ()=>{
+  const ContainerSvg = document.querySelector("svg")
+  setScale((prev)=>{
+    const newScale = prev+0.7
+        ContainerSvg.style.transform =`scale(${newScale}) translate(0px,0px)`
+        ContainerSvg.style.transition = "transform 0.2s ease"
+     
+ 
+        return newScale
+  })
+ 
+  
+
+  
+ 
+   
+ }
+
+
+ 
+ 
+const withBzierCurve   = () =>{
+
+
+
+
+  reset(document)
+ 
+ for(let i= 1;i<storecurrent.current.length-1;i++){
+  const prev = storecurrent.current[i-1]
+  const curr = storecurrent.current[i]
+ 
+    const midx = (curr.x + prev.x) / 2;
+      const midy = (curr.y+ prev.y) / 2;
+      quadrticCurver(
+        ctx.current,
+        prev.x,
+        prev.y,
+        midx,
+        midy,
+        curr.x,
+        curr.y,
+        colorState,
+        sizeLine,
+      );
+ }
+}
+
+ 
   return (
     <>
      
       {hidenavbar &&  
-      <div className="navbar">
-        <span className="o">
-          OpenSourceX {numberOfPage.current}
-          <img src="openSource.png" alt="logo" />
-          
-        </span>
 
-        <span >Untitled</span>
-     
+      <> 
+      <div className="navbar">
+
+        <span className="o"> OpenSourceX {numberOfPage.current} <img src="/openSource.png" alt="refresh-page"   />  </span>
+        <span  >Untitled</span>
         <button >Share</button>
-      </div> }
+      </div>
+      
+      <div className="online-nav-freind">
+
+       <div className="image-online">
+       <img src="/myface.png"/>
+       <img draggable= {false} src="https://politics.princeton.edu/sites/default/files/styles/square/public/images/p-5.jpeg?h=87dbaab7&itok=ub6jAL5Q"/>
+       <img draggable= {false} src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSAp3Z1hXfTVTKtbw3vE75-rtfr1ZCFcPSw4A&s"/>
+       <img draggable= {false} src="/plusthree.png"/>
+       </div>
+
+       <div className="online-button">
+          <button >Present</button>
+          <button >Share</button>
+      
+       </div>
+        
+
+      </div>
+
+       </>
+
+      }
+
+
+
+
 
       <div className="draw"
-      style={{ cursor: mode=="text"? "text":`url('./controllers/${baaaaaatamn(mode)}') ${mode=="select" ? "11 16":mode=="pen"? "4 32":"4 32"}, auto` }}
+      style={{ cursor: mode=="text"? "text":`url('/controllers/${baaaaaatamn(mode)}') ${mode=="select" ? "11 16":mode=="pen"? "4 32":"4 32"}, auto` }}
       ref={draw}>
         <canvas
           id="Layer1"
@@ -1030,10 +1086,7 @@ const handelinput =(e)=>{
                
          
         </svg>  
-        {/* <svg id="svg2" >
-
-
-        </svg> */}
+      
 
     {
        ( textmode.current && clickabletext )  && 
@@ -1061,10 +1114,10 @@ const handelinput =(e)=>{
        
 
         <div className="FatherImages" draggable={false}>
-          <img src="./leftSIdeImages/a.svg" draggable={false} />
+          <img src="/leftSIdeImages/a.svg" draggable={false} />
         </div>
           <div className="FatherImages">
-          <img src="./leftSIdeImages/c.svg" draggable={false} />
+          <img src="/leftSIdeImages/c.svg" draggable={false} />
         </div>
         <div
 
@@ -1081,7 +1134,7 @@ const handelinput =(e)=>{
           }}
 
         >
-          <img src="./leftSIdeImages/b.svg" draggable={false} />
+          <img src="/leftSIdeImages/b.svg" draggable={false} />
         </div>
           <div className="FatherImages" onClick={() => {
             ErraserMode.current = true
@@ -1090,15 +1143,21 @@ const handelinput =(e)=>{
             setmode("eraser")
 
           }}>
-         <img src="./leftSIdeImages/f.svg" draggable={false} />
+         <img src="/leftSIdeImages/f.svg" draggable={false} />
         </div>
-       <div className="FatherImages" onClick={() => reset(document)}>
+       <div className="FatherImages" onClick={() =>{
+         reset(document)
+         localStorage.removeItem("paths");
+         
+         
+         }}>
 
-         <img src="./leftSIdeImages/h.svg" draggable={false} />
+
+         <img src="/leftSIdeImages/h.svg" draggable={false} />
         </div>
 
         <div className="FatherImages">
-          <img src="./leftSIdeImages/d.svg" draggable={false} onClick={()=>{
+          <img src="/leftSIdeImages/d.svg" draggable={false} onClick={()=>{
             textmode.current = true
              setmode("text")
 
@@ -1106,12 +1165,12 @@ const handelinput =(e)=>{
           }}/>
         </div>
         <div className="FatherImages">
-          <img src="./leftSIdeImages/e.svg" draggable={false} />
+          <img src="/leftSIdeImages/e.svg" draggable={false} />
         </div>        <div className="FatherImages" onClick={() => HandelPasst()}>
-          <img src="./leftSIdeImages/undo.svg" draggable={false} />
+          <img src="/leftSIdeImages/undo.svg" draggable={false} />
         </div>
         <div className="FatherImages" onClick={() => HandelFuture()}>
-          <img src="./leftSIdeImages/redo.svg" draggable={false} />
+          <img src="/leftSIdeImages/redo.svg" draggable={false} />
         </div>
 
         <div className="FatherImages" onClick={() => {
@@ -1121,7 +1180,7 @@ const handelinput =(e)=>{
           setmode("select")
           
         }}>
-          <img src="./leftSIdeImages/select-svgrepo-com.svg" draggable={false} />
+          <img src="/leftSIdeImages/select-svgrepo-com.svg" draggable={false} />
         </div>
 
       </div>
@@ -1137,7 +1196,7 @@ const handelinput =(e)=>{
               id="vol"
               name="vol"
               min="2"
-              max="22"
+              max="42"
             />
             <div className="value">{sizeLine}</div>
           </div>
@@ -1170,6 +1229,12 @@ const handelinput =(e)=>{
        
        }
       {shortcut && <ShortcutsHint show ={shortcut}/>}
+      { !ShowReaction &&  <Reaction/>}
+      
+       <div className="zoom" onClick ={()=>handelZoom()}>
+        <span>+</span>
+       </div>
+     
     </>
   );
 };

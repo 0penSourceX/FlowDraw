@@ -1,0 +1,108 @@
+.button-container {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 8px;
+  padding: 8px;
+  background-color: #e8e4df;
+  border-radius: 9999px;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  z-index: 10;
+  transition: all 0.3s ease;
+  width:auto ;
+  position: absolute;
+  top: 0;
+  right: 0
+}
+
+.reaction-button {
+  position: relative;
+  padding: 8px 12px;
+  font-size: 1.5rem;
+  border: none;
+  border-radius: 9999px;
+  background-color: white;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+ 
+}
+
+.reaction-button::before {
+  content: '';
+  position: absolute;
+  top: -28px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: none;
+  height: 16px;
+  padding: 0 4px;
+  font-size: 0.6rem;
+  background-color: rgba(0,0,0,0.5);
+  color: white;
+  border-radius: 4px;
+  text-align: center;
+}
+
+.reaction-button:hover {
+  transform: translateY(-5px) scale(1.25);
+}
+
+.reaction-button.like::before {
+  content: 'Like';
+  ;
+}
+
+.reaction-button.cheer::before {
+  content: 'Cheer';
+}
+
+.reaction-button.celebrate::before {
+  content: 'Celebrate';
+}
+
+.reaction-button.appreciate::before {
+  content: 'Appreciate';
+}
+
+.reaction-button.smile::before {
+  content: 'Smile';
+}
+
+.reaction-button:hover::before {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Dark mode support (optional) */
+@media (prefers-color-scheme: dark) {
+  .button-container {
+    background-color: #191818;
+  }
+
+  .reaction-button {
+    background-color: #191818;
+  }
+
+  .reaction-button::before {
+    background-color: rgba(255,255,255,0.8);
+    color: black;
+  }
+}
+.container-d{
+    background-color: transparent;
+    position: absolute;
+    width: 100%;
+    bottom: 0;
+    height:100vh;
+    z-index: 9999;
+}
+.emoji-f{
+   
+ 
+border-radius: 10px;
+position: absolute;
+bottom: 0;
+ width: auto;
+  transition: all 0.3s ease;
+}

@@ -10,9 +10,14 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "bootstrap": "^5.3.8",
+    "floating.js": "^2.7.4",
     "ollama": "^0.6.3",
     "react": "^19.2.0",
+    "react-bootstrap": "^2.10.10",
+    "react-confetti": "^6.4.0",
     "react-dom": "^19.2.0",
+    "react-router-dom": "^7.14.0",
     "simplify-geometry": "^0.0.2",
     "styled-components": "^6.3.11"
   },

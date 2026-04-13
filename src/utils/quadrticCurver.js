@@ -1,5 +1,7 @@
  
-
+//@ this handel the draw curve
+// author @ghaith nahdi
+//@MIT lisence
 export function quadrticCurver (ctx,oldx,oldy,midx,midy,x,y,color,linewidth){
     ctx.save()
     ctx.beginPath();
