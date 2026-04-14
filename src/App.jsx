@@ -13,6 +13,7 @@ const App = () => {
       <Router>
       <Path path={"/app/board"} element={ <BoardRenderer/> }/>
       <Path path={"/test"} element={<BootStrap/>}/>
+   
       </Router>
    
 

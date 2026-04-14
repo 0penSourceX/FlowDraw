@@ -65,10 +65,9 @@ const BoardRenderer = () => {
   const [scale,setScale] = useState(1)
   const [images, setImages] = useState([]);
   let isMoveView = useRef(false)
-
   let fun = useRef({x : 0 , y : 0})
   let cumulatefun = useRef({x : 0 , y : 0})
-
+  let alphasize = useRef(0.5)
 
  
 
@@ -121,7 +120,11 @@ const BoardRenderer = () => {
   }, []);
 
 
-
+const setALphaline = (value)=>{
+  console.log(value/10)
+  alphasize.current = value/10
+  setx((prev)=>prev+1)
+}
 
  
  useEffect(()=>{
@@ -369,14 +372,13 @@ let fastcount = useRef(0)
     
      // box.style.transition = "transform 0.2s ease";
       box.style.transform = `translate(${cumulatefun.current.x}px,${0}px)`;
-
+ 
     
       fun.current.x = e.pageX 
       fun.current.y = e.pageY
 
     }
-
-
+ 
 
 
 
@@ -444,17 +446,23 @@ let fastcount = useRef(0)
  
 
 
-       // Reall Drawing                FreehandeBezierDrawing(draw,cord,Points)  FreehandeCatmualDrawing(draw,cord,Points)
+       // Reall Drawing           FreehandeBezierDrawing(draw,cord,Points)  FreehandeCatmualDrawing(draw,cord,Points)
       
        const BoundriesDraw = draw.current.getBoundingClientRect();
        const events = e.getCoalescedEvents?.() || [e];
        for (let i = 0; i < events.length; i++) {
 
-        const x =( events[i].clientX - BoundriesDraw.left)  
-        const y = (events[i].clientY - BoundriesDraw.top );
+        const xRaw =( events[i].clientX - BoundriesDraw.left)  
+        const yRaw = (events[i].clientY - BoundriesDraw.top );
+
+        const alpha = alphasize.current;
+
+        const x = cord.current.x + (xRaw - cord.current.x) * alpha;
+        const y = cord.current.y + (yRaw - cord.current.y) * alpha
+
         const dx = x - cord.current.x;
         const dy = y - cord.current.y;
-        
+       
         const distance = Math.sqrt(dx * dx + dy * dy);
    
      // if (distance <2) return;
@@ -464,8 +472,10 @@ let fastcount = useRef(0)
 
         quadrticCurver(ctx.current, cord.current.x, cord.current.y,midx,midy,x,y,colorState,sizeLine)
         Points.current.push({ x, y })
+        // think about send other line here cauz i think the lines here influcens by x and y
         cord.current.x = x
         cord.current.y = y
+        
 
       }
 
@@ -576,31 +586,31 @@ function clear(){
     }
   
    
-    let reduced = simplify(Points.current, 2);
+    let reduced = simplify(Points.current, 1.2);
    
     storecurrent.current =reduced
  
     const d = buildPath(reduced);
       // && isDrawingState.current == true 
-    //    if(d=="" &&  cursormode.current ==false && textmode.current == false ){
+         if(d=="" &&  cursormode.current ==false && textmode.current == false ){
  
-    //      const cx = cord.current.x; 
-    //      const cy = cord.current.y
-    //      const r = 1;  
-    //      const circlePath = `M ${cx + r}, ${cy} A ${r} ${r} 0 1 0 ${cx - r} ${cy} A ${r} ${r} 0 1 0 ${cx + r} ${cy} `;
-    //        const batman  = {
-    //          path : circlePath , 
-    //          color : colorState,
-    //          size : sizeLine
-    //        }
+           const cx = cord.current.x; 
+           const cy = cord.current.y
+           const r = 1;  
+           const circlePath = `M ${cx + r}, ${cy} A ${r} ${r} 0 1 0 ${cx - r} ${cy} A ${r} ${r} 0 1 0 ${cx + r} ${cy} `;
+             const batman  = {
+               path : circlePath , 
+               color : colorState,
+               size : sizeLine
+             }
  
-    //       Buffer.current.HandelPushPaths(batman)
-    //       DrawPoints(circlePath, colorState, sizeLine);
+            Buffer.current.HandelPushPaths(batman)
+            DrawPoints(circlePath, colorState, sizeLine);
         
-    //    }
+         }
 
 
-    // if(d=="") return
+      if(d=="") return
     
     const CollectLine  = {
       path : d , 
@@ -1008,7 +1018,7 @@ const handelinput =(e)=>{
 const withBzierCurve   = () =>{
 
 
-
+ 
 
   reset(document)
  
@@ -1207,7 +1217,9 @@ const withBzierCurve   = () =>{
       {show && (
         <div className="pickColor">
           <div className="range1">
-            <input
+
+           <h5 className="textPallete">size line </h5> 
+           <input
               type="range"
               onChange={(e) => setSizeLine(e.target.value)}
               id="vol"
@@ -1215,7 +1227,22 @@ const withBzierCurve   = () =>{
               min="2"
               max="42"
             />
-            <div className="value">{sizeLine}</div>
+             <div className="value">{sizeLine}</div>
+
+
+              <h5 className="textPallete">smooth line  </h5>
+              <input
+              type="range"
+              onChange={(e) => setALphaline(e.target.value)}
+              id="vol1"
+              name="vol2"
+              min="1"
+              max="8"
+            />
+
+            <div className="value">{alphasize.current}</div>
+           
+
           </div>
           <span className="title-color">All Colors</span>
           <div className="containerColors">
@@ -1255,3 +1282,5 @@ const withBzierCurve   = () =>{
 };
 
 export default BoardRenderer;
+
+ 
