@@ -43,8 +43,8 @@ const BoardRenderer = () => {
   const AllPath = useRef([]);
   let Buffer = useRef(new Path());
   let ErraserMode = useRef(false);
-  const [sizeLine, setSizeLine] = useState(7);
-  const [colorState, SetColorState] = useState("green");
+  const [sizeLine, setSizeLine] = useState(23);
+  const [colorState, SetColorState] = useState("black");
   const [show, SetShow] = useState(false);
   const [ShowSetting,SetShowSetting] = useState(false)
   const [showFirstBox,SetShowFirstBox] = useState(false)
@@ -70,7 +70,7 @@ const BoardRenderer = () => {
   let alphasize = useRef(0.5)
 
  
-
+// fix localstorage issue
 
 
 
@@ -127,6 +127,7 @@ const setALphaline = (value)=>{
 }
 
  
+
  useEffect(()=>{
  const ProtectAfterRelod = () =>{
   const arrayOfPath =  localStorage?.getItem("paths")
@@ -142,7 +143,6 @@ const setALphaline = (value)=>{
  ProtectAfterRelod()
  
  },[])
-
 
 
 
@@ -284,7 +284,6 @@ return()=>{
       }
      
 
- 
 
 
 
@@ -464,7 +463,7 @@ let fastcount = useRef(0)
         const dy = y - cord.current.y;
        
         const distance = Math.sqrt(dx * dx + dy * dy);
-   
+
      // if (distance <2) return;
 
         const midx = (cord.current.x + x) / 2;
@@ -579,7 +578,7 @@ function clear(){
 
   const HandelPointerUp = (e) => {
     clear()  
-    isMovingInfrastcture.current==false  
+    isMovingInfrastcture.current=false  
     isDrawingState.current = false;
     if(ErraserMode.current){
       return 
@@ -588,7 +587,7 @@ function clear(){
    
     let reduced = simplify(Points.current, 1.2);
    
-    storecurrent.current =reduced
+    storecurrent.current = reduced
  
     const d = buildPath(reduced);
       // && isDrawingState.current == true 
@@ -1175,8 +1174,9 @@ const withBzierCurve   = () =>{
        <div className="FatherImages" onClick={() =>{
          reset(document)
          localStorage.removeItem("paths");
-         
-         
+         AllPath.current  =[]
+         Points.current = []
+         Buffer.current.intialzeArrays()
          }}>
 
 

@@ -26,5 +26,10 @@ export class Path {
  getcurrentPaths (){
     return this.array
  }
+ intialzeArrays(){
+    this.array = []
+    this.undo = []
+    this.rendo = []
+ }
 
 }
