@@ -39,7 +39,10 @@ Here’s a glimpse of what you can expect:
       <source src="./public/videoshow/show.mp4" type="video/mp4">
     
  </video>
-
+ <p>Version 2.0.0</p>
+ <h3>we fix issie curves and squares draw it appear good </h3>
+<img src="./githubPic/ee.png"></img>
+ 
 
 ---
 

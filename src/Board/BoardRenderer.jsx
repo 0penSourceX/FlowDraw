@@ -68,9 +68,9 @@ const BoardRenderer = () => {
   let fun = useRef({x : 0 , y : 0})
   let cumulatefun = useRef({x : 0 , y : 0})
   let alphasize = useRef(0.5)
-
- 
-// fix localstorage issue
+  let isContextMenu = useRef(false)
+  
+// fix localstorage issue // done baby 
 
 
 
@@ -171,9 +171,10 @@ useEffect(()=>{
      e.preventDefault()
      isDrawingState.current = false
      isMoveView.current = true
-      fun.current.x = e.pageX 
-      fun.current.y = e.pageY
-     console.log("this event fired",lastCordImage)
+      // fun.current.x = e.pageX 
+      // fun.current.y = e.pageY
+      // console.log("this event fired",lastCordImage)
+      setx((prev)=>prev+1)
      
   } 
 
@@ -400,7 +401,7 @@ let fastcount = useRef(0)
 
  
     if(ErraserMode.current &&  textmode.current == false ){
-
+   
     const BoundriesDrawx = draw.current.getBoundingClientRect();
  
      if(fastcount.current>33){
@@ -585,12 +586,12 @@ function clear(){
     }
   
    
-    let reduced = simplify(Points.current, 1.2);
+    //let reduced = simplify(Points.current, 0.2); i use use this in old version
    
-    storecurrent.current = reduced
+    //storecurrent.current = Points.current
  
-    const d = buildPath(reduced);
-      // && isDrawingState.current == true 
+    const d = buildPath(Points.current);
+   
          if(d=="" &&  cursormode.current ==false && textmode.current == false ){
  
            const cx = cord.current.x; 
@@ -605,11 +606,10 @@ function clear(){
  
             Buffer.current.HandelPushPaths(batman)
             DrawPoints(circlePath, colorState, sizeLine);
-        
+         return 
          }
 
-
-      if(d=="") return
+ 
     
     const CollectLine  = {
       path : d , 
@@ -821,7 +821,7 @@ const handelcolortheme = (bgcolor) =>{
 
 
 
- const handelPointerLine = (e)=>{
+ const handelClickObjects = (e)=>{
          
 
 
@@ -838,11 +838,13 @@ const handelcolortheme = (bgcolor) =>{
 
  
  const typeTagName = e.target.tagName
- if(typeTagName =="image" && !isMovingInfrastcture.current && !ErraserMode.current){
-  setmode("select")
- }
-  if( typeTagName =="image"  && isMovingInfrastcture.current==true ){
  
+//  if(typeTagName =="image" && !isMovingInfrastcture.current && !ErraserMode.current){
+//   setmode("select")
+//  }
+ 
+  if( typeTagName =="image"  && isMovingInfrastcture.current==true  && !ErraserMode.current){
+     
  
 
 
@@ -875,11 +877,12 @@ const handelcolortheme = (bgcolor) =>{
 
   }
  
-  if(typeTagName=="text" || typeTagName =="image"  && ErraserMode.current && isDrawingState.current)  {
+  if(typeTagName=="text" || typeTagName =="image"  && ErraserMode.current  )  {
 
       console.log(e.target.tagName,"we détected you ")
-      e.target.remove()
+       //e.target.remove()
       setmode("eraser")
+      
   }
   else if(typeTagName=="path" && ErraserMode.current && isDrawingState.current==true) {
  
@@ -1014,33 +1017,7 @@ const handelinput =(e)=>{
 
  
  
-const withBzierCurve   = () =>{
-
-
  
-
-  reset(document)
- 
- for(let i= 1;i<storecurrent.current.length-1;i++){
-  const prev = storecurrent.current[i-1]
-  const curr = storecurrent.current[i]
- 
-    const midx = (curr.x + prev.x) / 2;
-      const midy = (curr.y+ prev.y) / 2;
-      quadrticCurver(
-        ctx.current,
-        prev.x,
-        prev.y,
-        midx,
-        midy,
-        curr.x,
-        curr.y,
-        colorState,
-        sizeLine,
-      );
- }
-}
-
  
   return (
     <>
@@ -1097,7 +1074,7 @@ const withBzierCurve   = () =>{
         <svg id="svg"
         
         onMouseUp={()=>handelMouseUp()}
-        onPointerMove={(e)=>handelPointerLine(e)}
+        onPointerMove={(e)=>handelClickObjects(e)}
         onPointerDown={
           (e)=> {
             handelsvgdown(e)
@@ -1164,9 +1141,10 @@ const withBzierCurve   = () =>{
         </div>
           <div className="FatherImages" onClick={() => {
             ErraserMode.current = true
+            setmode("eraser")
             SetHelper((prev)=>prev+1)
 
-            setmode("eraser")
+            
 
           }}>
          <img src="/leftSIdeImages/f.svg" draggable={false} />
