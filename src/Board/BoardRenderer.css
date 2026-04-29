@@ -370,7 +370,7 @@ body{
     border-radius: 10px;
     margin-left: 8px;
     background-color: white;
-    height: 70%;
+    height:auto;
     position: fixed;
     left: 0;
     z-index: 99;
@@ -474,7 +474,7 @@ body{
     border-radius: 10px;
     margin-left: 8px;
     background-color: white;
-     height: 50%;
+     height: 70%;
     position: fixed;
     left: 0;
     z-index: 99;

@@ -44,7 +44,7 @@ Here’s a glimpse of what you can expect:
 <img src="./githubPic/ee.png"></img>
  
 
----
+ 
 
 ## 🚀 Features
 

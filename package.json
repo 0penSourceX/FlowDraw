@@ -17,6 +17,7 @@
     "react-bootstrap": "^2.10.10",
     "react-confetti": "^6.4.0",
     "react-dom": "^19.2.0",
+    "react-pro-sidebar": "^1.1.0",
     "react-router-dom": "^7.14.0",
     "simplify-geometry": "^0.0.2",
     "styled-components": "^6.3.11"

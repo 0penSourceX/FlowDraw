@@ -24,7 +24,10 @@ import { uploadToCloudinary } from "../utils/uploadToCloudinary";
 
 
 const BoardRenderer = () => {
-  
+  // important features  when you remove using erraser 
+  // you should be first make like grey thing and then delete i again
+  // you can export you type their
+  // type repport to people to see it how i drag things and thhat genious idea
  
   let HelperSlide = useRef({x:0,y:0})
   const [ShowReaction,SetShoReaction]= useState(true)
@@ -43,7 +46,7 @@ const BoardRenderer = () => {
   const AllPath = useRef([]);
   let Buffer = useRef(new Path());
   let ErraserMode = useRef(false);
-  const [sizeLine, setSizeLine] = useState(23);
+  const [sizeLine, setSizeLine] = useState(6);
   const [colorState, SetColorState] = useState("black");
   const [show, SetShow] = useState(false);
   const [ShowSetting,SetShowSetting] = useState(false)
@@ -68,13 +71,33 @@ const BoardRenderer = () => {
   let fun = useRef({x : 0 , y : 0})
   let cumulatefun = useRef({x : 0 , y : 0})
   let alphasize = useRef(0.5)
-  let isContextMenu = useRef(false)
-  
-// fix localstorage issue // done baby 
-
-
-
  
+  let isContextMenu = useRef(false)
+ 
+
+  let CurrentPostionDragCord     =  useRef({
+    x : 0 , 
+    y : 0 
+  })
+
+
+ let dxx = useRef(0)
+ let dyy = useRef(0)
+const StorePlacment = useRef(new Map())
+let fastcount = useRef(0)
+
+
+
+
+
+
+
+
+
+// fix localstorage issue // done baby 
+// do canvas move to se how type inside it important
+// do canvasa moving do this featuers
+
   useEffect(() => {
     const handlePaste = async (event) => {
       event.preventDefault();
@@ -121,7 +144,7 @@ const BoardRenderer = () => {
 
 
 const setALphaline = (value)=>{
-  console.log(value/10)
+   
   alphasize.current = value/10
   setx((prev)=>prev+1)
 }
@@ -175,6 +198,7 @@ useEffect(()=>{
       // fun.current.y = e.pageY
       // console.log("this event fired",lastCordImage)
       setx((prev)=>prev+1)
+      console.log("im working")
      
   } 
 
@@ -326,56 +350,59 @@ return()=>{
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
  
 
-let fastcount = useRef(0)
+function updatePosition(dx ,dy){
+  
+
+       const AllPaths = document.querySelectorAll("g")
+     
+   
+       AllPaths.forEach((nodes)=>{
+        
+        if (StorePlacment.current.has(nodes)){
+          let newX  = StorePlacment.current.get(nodes).x+dx
+          let newY= StorePlacment.current.get(nodes).y+dy
+     
+          nodes.style.transform = `translate(${newX}px,${newY}px)`
+          StorePlacment.current.set(nodes,{x:newX,y:newY})
+        }else{
+      
+      
+          nodes.style.transform = `translate(${dx}px,${dy}px)`
+          StorePlacment.current.set(nodes, {x:dx, y : dy})
+        }
+    
+      })
+ 
+
+
+
+}
+
+
+
+
+
+
+
+
+
+
   const HandelMove = (e) => {
  
 
     if(isMoveView.current){
-      
-      const maxX = 0;
-    
-      const widthMax = window.innerWidth -draw.current.scrollWidth
-      const heightMax = window.innerHeight -draw.current.scrollHeight
-
-
-     
    
-      const dx = e.pageX - fun.current.x
-      const dy = e.pageY - fun.current.y
+        const dx = e.clientX - CurrentPostionDragCord.current.x
+        const dy = e.clientY - CurrentPostionDragCord.current.y
+      
+       updatePosition(dx,dy)
+          
+        CurrentPostionDragCord.current.x =  e.clientX
+        CurrentPostionDragCord.current.y =  e.clientY
 
-      cumulatefun.current.x+=dx
-      cumulatefun.current.y+=dy
-      cumulatefun.current.x = Math.min(maxX,Math.max(cumulatefun.current.x,widthMax))
-      cumulatefun.current.y = Math.min(0, Math.max(cumulatefun.current.y,heightMax));
-      const box = document.querySelector(".draw");
- 
-  
-    
-     // box.style.transition = "transform 0.2s ease";
-      box.style.transform = `translate(${cumulatefun.current.x}px,${0}px)`;
- 
-    
-      fun.current.x = e.pageX 
-      fun.current.y = e.pageY
+   
 
     }
  
@@ -443,11 +470,6 @@ let fastcount = useRef(0)
  
        if (!isDrawingState.current || ErraserMode.current ||  cursormode.current || textmode.current) return;
      
- 
-
-
-       // Reall Drawing           FreehandeBezierDrawing(draw,cord,Points)  FreehandeCatmualDrawing(draw,cord,Points)
-      
        const BoundriesDraw = draw.current.getBoundingClientRect();
        const events = e.getCoalescedEvents?.() || [e];
        for (let i = 0; i < events.length; i++) {
@@ -465,14 +487,12 @@ let fastcount = useRef(0)
        
         const distance = Math.sqrt(dx * dx + dy * dy);
 
-     // if (distance <2) return;
 
         const midx = (cord.current.x + x) / 2;
         const midy = (cord.current.y + y) / 2;
 
         quadrticCurver(ctx.current, cord.current.x, cord.current.y,midx,midy,x,y,colorState,sizeLine)
         Points.current.push({ x, y })
-        // think about send other line here cauz i think the lines here influcens by x and y
         cord.current.x = x
         cord.current.y = y
         
@@ -498,7 +518,7 @@ let fastcount = useRef(0)
 
   const HandelDown = (e) => {
 
- 
+       
     Setclickabletext(true)
     isDrawingState.current = true;
     const BoundriesDraw = canvas.current.getBoundingClientRect();
@@ -511,6 +531,8 @@ let fastcount = useRef(0)
     cord.current.y = y;
     lastCordImage.current.x = x 
     lastCordImage.current.y = y 
+    CurrentPostionDragCord.current.x  = x 
+    CurrentPostionDragCord.current.y = y 
      if(textmode.current){
       console.log("this text mode",{x,y})
      //   DrawText("we love   hub",x,y,   "black",  33,  "start")
@@ -521,8 +543,7 @@ let fastcount = useRef(0)
 
 
 
-
-
+ 
 
 
 
@@ -586,9 +607,9 @@ function clear(){
     }
   
    
-    //let reduced = simplify(Points.current, 0.2); i use use this in old version
+     let reduced = simplify(Points.current, 2);  
    
-    //storecurrent.current = Points.current
+    storecurrent.current = Points.current
  
     const d = buildPath(Points.current);
    
@@ -605,8 +626,8 @@ function clear(){
              }
  
             Buffer.current.HandelPushPaths(batman)
-            DrawPoints(circlePath, colorState, sizeLine);
-         return 
+           // DrawPoints(circlePath, colorState, sizeLine);
+             return 
          }
 
  
@@ -1262,3 +1283,47 @@ const handelinput =(e)=>{
 export default BoardRenderer;
 
  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
