@@ -302,9 +302,7 @@ return()=>{
           localStorage.setItem("paths", JSON.stringify(removeLastChild));
           console.log("should bne redraw all thing")
           reset(document)
-          removeLastChild.forEach((item)=>{
-            DrawPoints(item.path,item.color,item.size)
-          })
+ 
           
       }
      
