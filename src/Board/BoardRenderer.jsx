@@ -301,7 +301,7 @@ return()=>{
           removeLastChild.pop();
           localStorage.setItem("paths", JSON.stringify(removeLastChild));
           console.log("should bne redraw all thing")
-          reset(document)
+          
  
           
       }
