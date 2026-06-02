@@ -1235,6 +1235,7 @@ const handelinput =(e)=>{
               name="vol2"
               min="1"
               max="8"
+              step="0.001"
             />
 
             <div className="value">{alphasize.current}</div>
